@@ -266,24 +266,28 @@ var player={
 	}
 }
 window.onkeydown = function(e){
-	e.preventDefault();
    if(e.keyCode == 32 ) {
+   		e.preventDefault();
     	player.toggle(1);
 	}else if(e.keyCode==37 || e.keyCode==39){
 		switch(e.keyCode){
 			case 37:
+				e.preventDefault();
 				player.service("left_arrow");
 				break;
 			case 39:
+				e.preventDefault();
 				player.service("right_arrow");
 				break;
 		}
 	}else if(e.keyCode==38 || e.keyCode==40){
 		switch(e.keyCode){
 			case 38:
+				e.preventDefault();
 				player.service("up_arrow");
 				break;
 			case 40:
+				e.preventDefault();
 				player.service("down_arrow");
 				break;
 		}
