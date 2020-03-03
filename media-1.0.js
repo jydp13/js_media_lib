@@ -23,6 +23,7 @@ var player={
 										"<button type='button' onclick='player.service(this.innerHTML)'>Play</button>"+
 						 				"<button type='button' onclick='player.service(this.innerHTML)'>Pause</button>"+
 						 				"<button type='button' onclick='player.service(this.innerHTML)'>Restart</button>"+
+						 				"<button type='button' id='mute_unmute_button' onclick='player.service(this.innerHTML)'>Mute</button>"+
 									"</div>"
 								"</div>";
 			return this.video_player;	
@@ -57,6 +58,7 @@ var player={
 	},
 	service:function(user_input){
 		this.actual_player=document.getElementById(this.player_type);
+		var mute_unmute_button=document.getElementById("mute_unmute_button");
 		if (user_input=="Play") {
 			this.progressbar.start();
 			this.actual_player.play();
@@ -66,6 +68,12 @@ var player={
 		}else if (user_input=="Restart") {
 			this.actual_player.currentTime=0;
 			this.service("Play");
+		}else if (user_input=="Mute") {
+			this.actual_player.muted=true;
+			mute_unmute_button.innerHTML="Unmute";
+		}else if (user_input=="Unmute") {
+			this.actual_player.muted=false;
+			mute_unmute_button.innerHTML="Mute";
 		}
 	},
 	set_player:function(player_type,player_width,player_height,player_style){
