@@ -1,4 +1,6 @@
 var player={
+	screen_width:screen.availWidth,
+	screen_height:screen.availHeight,
 	actual_player:null,
 	player_type:null,
 	player_width:null,
@@ -16,18 +18,64 @@ var player={
 			this.video_player="<div id='player'>"+
 									"<div id='display'>"+
 										"<video id='video' src='"+this.video_file+"' type='"+this.video_type+"' width="+player.player_width+"px height='"+player.player_height+"px'></div>"+
-									"<div id='menu'>"+
-										"<div id='progressbar' style='border: solid;height: 5px;width:"+player.player_width+"px;'>"+
+									"<div id='menu' >"+
+										"<div id='progressbar' style='color:blue;border: solid;height: 5px;width:"+player.player_width+"px;'>"+
 											"<div id='progress'></div>" +
 										"</div>"+
-										"<button type='button' onclick='player.service(this.innerHTML)'>Play</button>"+
-						 				"<button type='button' onclick='player.service(this.innerHTML)'>Pause</button>"+
+										"<button type='button' id='play_pause' onclick='player.service(this.innerHTML)'>Play</button>"+
 						 				"<button type='button' onclick='player.service(this.innerHTML)'>Restart</button>"+
 						 				"<button type='button' id='mute_unmute_button' onclick='player.service(this.innerHTML)'>Mute</button>"+
-									"</div>"
+						 				"<button type='button' id='fullscreen' onclick='player.service(this.innerHTML)'>Fullscreen</button>"+
+									"</div>"+
 								"</div>";
 			return this.video_player;	
+		},
+		fullscreen:function(){
+   			var requestMethod = document.body.requestFullScreen || document.body.webkitRequestFullScreen || document.body.mozRequestFullScreen || document.body.msRequestFullscreen;
+  			if (requestMethod) {
+  				requestMethod.call(document.body); 
+        		this.player_screen_util("fullscreen");
+        	}
+    		else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+        		var wscript = new ActiveXObject("WScript.Shell");
+            	if (wscript !== null) {
+                	wscript.SendKeys("{F11}");
+                	this.player_screen_util("fullscreen");
+           		 }
+        	}
+    		return false;
+		},
+		exitfullscreen:function(){
+			var requestMethod=document.exitFullscreen||document.mozCancelFullScreen||document.webkitExitFullscreen||ocument.msExitFullscreen;
+			if (requestMethod) {
+				requestMethod.call(document);
+				this.player_screen_util("exitfullscreen");
+			}else if (typeof window.ActiveXObject !== "undefined") { 
+        		var wscript = new ActiveXObject("WScript.Shell");
+            	if (wscript !== null) {
+                	wscript.SendKeys("{F11}");
+                	this.player_screen_util("exitfullscreen");
+           		}
+        	}
+        	return false;
+		},
+		player_screen_util:function(input){
+			var bar=document.getElementById("progressbar");
+			if (input=="fullscreen") {
+        		this.fullscreen_style="width:"+player.screen_width+"px;height:"+player.screen_height+"px";
+        		player.actual_player.style=this.fullscreen_style;
+        		bar.style="width:"+player.screen_width+"px;color:blue;border:solid;";
+        		player.player_width_backup=player.player_width;
+        		player.player_width=player.screen_width;
+
+			}else if (input=="exitfullscreen") {
+				this.exitfullscreen_style="width:"+player.player_width_backup+"px;"+player.player_height+"px";
+				player.actual_player.style=this.exitfullscreen_style;
+				bar.style="width:"+player.player_width_backup+"px;color:blue;border:solid;";
+				player.player_width=player.player_width_backup;
+			}
 		}
+		
 	},
 	audioplayer:{
 		get:function(){
@@ -59,12 +107,16 @@ var player={
 	service:function(user_input){
 		this.actual_player=document.getElementById(this.player_type);
 		var mute_unmute_button=document.getElementById("mute_unmute_button");
+		var fullscreen=document.getElementById("fullscreen");
+		var play_pause=document.getElementById("play_pause");
 		if (user_input=="Play") {
 			this.progressbar.start();
 			this.actual_player.play();
+			play_pause.innerHTML="Pause";//play and pause can be combined into on button just like fullscreen buttton
 		}else if (user_input=="Pause") {
 			this.progressbar.stop();
 			this.actual_player.pause();
+			play_pause.innerHTML="Play";
 		}else if (user_input=="Restart") {
 			this.actual_player.currentTime=0;
 			this.service("Play");
@@ -74,6 +126,12 @@ var player={
 		}else if (user_input=="Unmute") {
 			this.actual_player.muted=false;
 			mute_unmute_button.innerHTML="Mute";
+		}else if (user_input=="Fullscreen") {
+			this.videoplayer.fullscreen();
+			fullscreen.innerHTML="Exit fullscreen";
+		}else if (user_input=="Exit fullscreen") {
+			this.videoplayer.exitfullscreen();
+			fullscreen.innerHTML="Fullscreen";
 		}
 	},
 	set_player:function(player_type,player_width,player_height,player_style){
@@ -84,8 +142,8 @@ var player={
 			this.actual_player=document.getElementById(player_type);
 			this.player_type=player_type;
 		}
-		this.player_width=player_width;
-		this.player_height=player_height;
+		this.player_width=(this.screen_width/100)*player_width;
+		this.player_height=(this.screen_height/100)*player_height;
 		this.player_style=player_style;
 	},
 	get_player:function(){
