@@ -112,7 +112,7 @@ var player={
 		if (user_input=="Play") {
 			this.progressbar.start();
 			this.actual_player.play();
-			play_pause.innerHTML="Pause";//play and pause can be combined into on button just like fullscreen buttton
+			play_pause.innerHTML="Pause";
 		}else if (user_input=="Pause") {
 			this.progressbar.stop();
 			this.actual_player.pause();
