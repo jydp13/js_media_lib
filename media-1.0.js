@@ -6,6 +6,9 @@ var player={
 	player_width:null,
 	player_height:null,
 	player_style:null,
+	play_status:false,
+	fullscreen_status:false,
+	click_count:0,
 	media:{
 		name:null,
 		type:null,
@@ -16,10 +19,10 @@ var player={
 			this.video_file=player.get_media().name+"."+player.get_media().format;
 			this.video_type=player.player_type+"/"+player.get_media().format;
 			this.video_player="<div id='player'>"+
-									"<div id='display'>"+
+									"<div id='display' onclick='player.toggle()'>"+
 										"<video id='video' src='"+this.video_file+"' type='"+this.video_type+"' width="+player.player_width+"px height='"+player.player_height+"px'></div>"+
 									"<div id='menu' >"+
-										"<div id='progressbar' style='color:blue;border: solid;height: 5px;width:"+player.player_width+"px;'>"+
+										"<div id='progressbar' onclick='player.service(0)' style='color:blue;border: solid;height: 5px;width:"+player.player_width+"px;'>"+
 											"<div id='progress'></div>" +
 										"</div>"+
 										"<button type='button' id='play_pause' onclick='player.service(this.innerHTML)'>Play</button>"+
@@ -113,10 +116,12 @@ var player={
 			this.progressbar.start();
 			this.actual_player.play();
 			play_pause.innerHTML="Pause";
+			this.play_status=true;
 		}else if (user_input=="Pause") {
 			this.progressbar.stop();
 			this.actual_player.pause();
 			play_pause.innerHTML="Play";
+			this.play_status=false;
 		}else if (user_input=="Restart") {
 			this.actual_player.currentTime=0;
 			this.service("Play");
@@ -129,10 +134,38 @@ var player={
 		}else if (user_input=="Fullscreen") {
 			this.videoplayer.fullscreen();
 			fullscreen.innerHTML="Exit fullscreen";
+			this.fullscreen_status=true;
 		}else if (user_input=="Exit fullscreen") {
 			this.videoplayer.exitfullscreen();
 			fullscreen.innerHTML="Fullscreen";
+			this.fullscreen_status=false;
+		}else if (user_input==0) {
+			var video_time=(event.clientX*this.actual_player.duration)/this.player_width;
+			this.actual_player.currentTime=video_time;
+			this.service("Play");
 		}
+	},
+	toggle:function(){
+		this.click_count++;
+		var id=setTimeout(() =>{
+			if (this.click_count==2) {
+				if (this.fullscreen_status==false) {
+					this.service("Fullscreen");
+				}else if (this.fullscreen_status==true) {
+					this.service("Exit fullscreen");
+				}
+				this.click_count=0;
+				clearTimeout(id);
+			}else if (this.click_count==1) {
+				if (this.play_status==false) {
+					this.service("Play");
+				}else if (this.play_status==true) {
+					this.service("Pause");
+				}
+				this.click_count=0;
+				clearTimeout(id);
+			}
+		},500);
 	},
 	set_player:function(player_type,player_width,player_height,player_style){
 		if (player_type=="audio") {
