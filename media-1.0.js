@@ -19,7 +19,7 @@ var player={
 			this.video_file=player.get_media().name+"."+player.get_media().format;
 			this.video_type=player.player_type+"/"+player.get_media().format;
 			this.video_player="<div id='player'>"+
-									"<div id='display' onclick='player.toggle()'>"+
+									"<div id='display' onclick='player.toggle(0)'>"+
 										"<video id='video' src='"+this.video_file+"' type='"+this.video_type+"' width="+player.player_width+"px height='"+player.player_height+"px'></div>"+
 									"<div id='menu' >"+
 										"<div id='progressbar' onclick='player.service(0)' style='color:blue;border: solid;height: 5px;width:"+player.player_width+"px;'>"+
@@ -29,6 +29,7 @@ var player={
 						 				"<button type='button' onclick='player.service(this.innerHTML)'>Restart</button>"+
 						 				"<button type='button' id='mute_unmute_button' onclick='player.service(this.innerHTML)'>Mute</button>"+
 						 				"<button type='button' id='fullscreen' onclick='player.service(this.innerHTML)'>Fullscreen</button>"+
+						 				"<div id=>"+
 									"</div>"+
 								"</div>";
 			return this.video_player;	
@@ -140,13 +141,16 @@ var player={
 			fullscreen.innerHTML="Fullscreen";
 			this.fullscreen_status=false;
 		}else if (user_input==0) {
+			//var percetange=(event.clientX*100)/this.player_width;
+			//var video_time=(percetange/100)*this.actual_player.duration;
 			var video_time=(event.clientX*this.actual_player.duration)/this.player_width;
 			this.actual_player.currentTime=video_time;
 			this.service("Play");
 		}
 	},
-	toggle:function(){
-		this.click_count++;
+	toggle:function(input){
+		if (input==0) {
+			this.click_count++;
 		var id=setTimeout(() =>{
 			if (this.click_count==2) {
 				if (this.fullscreen_status==false) {
@@ -166,6 +170,14 @@ var player={
 				clearTimeout(id);
 			}
 		},500);
+		}else if (input==1) {
+			if (this.play_status==false) {
+				this.service("Play");
+			}else if (this.play_status==true) {
+				this.service("Pause");
+			}
+		}
+		
 	},
 	set_player:function(player_type,player_width,player_height,player_style){
 		if (player_type=="audio") {
@@ -195,3 +207,9 @@ var player={
 		return this.media;
 	}
 }
+window.onkeydown = function(e){
+   if(e.keyCode == 32 ) {
+    	player.toggle(1);
+    }
+};
+
