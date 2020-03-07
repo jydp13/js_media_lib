@@ -9,6 +9,8 @@ var player={
 	play_status:false,
 	fullscreen_status:false,
 	click_count:0,
+	arrow_value:0.1,
+	sound_arrow_value:0.2,
 	media:{
 		name:null,
 		type:null,
@@ -26,9 +28,10 @@ var player={
 											"<div id='progress'></div>" +
 										"</div>"+
 										"<button type='button' id='play_pause' onclick='player.service(this.innerHTML)'>Play</button>"+
+										"<button type='button'  onclick='player.service(this.innerHTML)'>Stop</button>"+
 						 				"<button type='button' onclick='player.service(this.innerHTML)'>Restart</button>"+
 						 				"<button type='button' id='mute_unmute_button' onclick='player.service(this.innerHTML)'>Mute</button>"+
-						 				"<button type='button' id='fullscreen' onclick='player.service(this.innerHTML)'>Fullscreen</button>"+
+										 "<button type='button' id='fullscreen' onclick='player.service(this.innerHTML)'>Fullscreen</button>"+
 						 				"<div id=>"+
 									"</div>"+
 								"</div>";
@@ -91,8 +94,11 @@ var player={
 		start:function(){
 			this.id=setInterval(this.progress,1000);
 		},
-		stop:function(){
+		pause:function(){
 			clearInterval(this.id);
+		},
+		stop:function(){
+			this.progress();
 		},
 		progress:function(){
 			var percentage=(player.actual_player.currentTime*100)/player.actual_player.duration;
@@ -119,7 +125,7 @@ var player={
 			play_pause.innerHTML="Pause";
 			this.play_status=true;
 		}else if (user_input=="Pause") {
-			this.progressbar.stop();
+			this.progressbar.pause();
 			this.actual_player.pause();
 			play_pause.innerHTML="Play";
 			this.play_status=false;
@@ -141,11 +147,50 @@ var player={
 			fullscreen.innerHTML="Fullscreen";
 			this.fullscreen_status=false;
 		}else if (user_input==0) {
-			//var percetange=(event.clientX*100)/this.player_width;
-			//var video_time=(percetange/100)*this.actual_player.duration;
 			var video_time=(event.clientX*this.actual_player.duration)/this.player_width;
 			this.actual_player.currentTime=video_time;
 			this.service("Play");
+		}else if(user_input=="Stop"){
+			this.service("Pause");
+			this.actual_player.currentTime=this.actual_player.duration;
+			this.progressbar.stop();
+		}
+		else if(user_input=="left_arrow" || user_input=="right_arrow"){
+			switch(user_input){
+				case "left_arrow":
+					try{
+						this.actual_player.currentTime-=this.arrow_value*this.actual_player.duration
+						this.service("Play");
+					}catch(error){
+						//console.log(error);
+					}		
+					break;
+				case "right_arrow":
+					try{
+						this.actual_player.currentTime+=this.arrow_value*this.actual_player.duration;
+						this.service("Play");
+					}catch(error){
+						//console.log(error);
+					}	
+					break;
+			}
+		}else if(user_input=="up_arrow" || user_input=="down_arrow"){
+			switch(user_input){
+				case "up_arrow":
+					try{
+						this.actual_player.volume+=this.sound_arrow_value;
+					}catch(error){
+						//console.log("volume out of range");
+					}	
+					break;
+				case "down_arrow":
+					try{
+						this.actual_player.volume-=this.sound_arrow_value;
+					}catch(error){
+						//console.log("volume out of range");
+					}	
+					break;
+			}
 		}
 	},
 	toggle:function(input){
@@ -208,8 +253,27 @@ var player={
 	}
 }
 window.onkeydown = function(e){
+	e.preventDefault();
    if(e.keyCode == 32 ) {
     	player.toggle(1);
-    }
+	}else if(e.keyCode==37 || e.keyCode==39){
+		switch(e.keyCode){
+			case 37:
+				player.service("left_arrow");
+				break;
+			case 39:
+				player.service("right_arrow");
+				break;
+		}
+	}else if(e.keyCode==38 || e.keyCode==40){
+		switch(e.keyCode){
+			case 38:
+				player.service("up_arrow");
+				break;
+			case 40:
+				player.service("down_arrow");
+				break;
+		}
+	}
 };
 
