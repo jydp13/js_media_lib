@@ -119,43 +119,56 @@ var player={
 		var mute_unmute_button=document.getElementById("mute_unmute_button");
 		var fullscreen=document.getElementById("fullscreen");
 		var play_pause=document.getElementById("play_pause");
-		if (user_input=="Play") {
-			this.progressbar.start();
-			this.actual_player.play();
-			play_pause.innerHTML="Pause";
-			this.play_status=true;
-		}else if (user_input=="Pause") {
-			this.progressbar.pause();
-			this.actual_player.pause();
-			play_pause.innerHTML="Play";
-			this.play_status=false;
-		}else if (user_input=="Restart") {
-			this.actual_player.currentTime=0;
-			this.service("Play");
-		}else if (user_input=="Mute") {
-			this.actual_player.muted=true;
-			mute_unmute_button.innerHTML="Unmute";
-		}else if (user_input=="Unmute") {
-			this.actual_player.muted=false;
-			mute_unmute_button.innerHTML="Mute";
-		}else if (user_input=="Fullscreen") {
-			this.videoplayer.fullscreen();
-			fullscreen.innerHTML="Exit fullscreen";
-			this.fullscreen_status=true;
-		}else if (user_input=="Exit fullscreen") {
-			this.videoplayer.exitfullscreen();
-			fullscreen.innerHTML="Fullscreen";
-			this.fullscreen_status=false;
-		}else if (user_input==0) {
-			var video_time=(event.clientX*this.actual_player.duration)/this.player_width;
-			this.actual_player.currentTime=video_time;
-			this.service("Play");
-		}else if(user_input=="Stop"){
-			this.service("Pause");
-			this.actual_player.currentTime=this.actual_player.duration;
-			this.progressbar.stop();
+				switch(user_input){
+			case "Play":
+				this.progressbar.start();
+				this.actual_player.play();
+				play_pause.innerHTML="Pause";
+				this.play_status=true;
+				break;
+			case "Pause":
+				this.progressbar.pause();
+				this.actual_player.pause();
+				play_pause.innerHTML="Play";
+				this.play_status=false;
+				break;
+			case "Restart":
+				this.actual_player.currentTime=0;
+				this.hour=0;
+				this.minute=0;
+				this.second=0;
+				this.service("Play");
+				break;
+			case "Mute":
+				this.actual_player.muted=true;
+				mute_unmute_button.innerHTML="Unmute";
+				break;
+			case "Unmute":
+				this.actual_player.muted=false;
+				mute_unmute_button.innerHTML="Mute";
+				break;
+			case "Fullscreen":
+				this.videoplayer.fullscreen();
+				fullscreen.innerHTML="Exit fullscreen";
+				this.fullscreen_status=true;
+				break;
+			case "Exit fullscreen":
+				this.videoplayer.exitfullscreen();
+				fullscreen.innerHTML="Fullscreen";
+				this.fullscreen_status=false;
+				break;
+			case 0:
+				var video_time=(event.clientX*this.actual_player.duration)/this.player_width;
+				this.actual_player.currentTime=video_time;
+				this.service("Play");
+				break;
+			case "Stop":
+				this.service("Pause");
+				this.actual_player.currentTime=this.actual_player.duration;
+				this.progressbar.stop();
+				break;
 		}
-		else if(user_input=="left_arrow" || user_input=="right_arrow"){
+		if(user_input=="left_arrow" || user_input=="right_arrow"){
 			switch(user_input){
 				case "left_arrow":
 					try{
